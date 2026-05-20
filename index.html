@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Cuidado no entrar rastreadores</title>
-
 <style>
 body{
   margin:0;
@@ -13,18 +12,29 @@ body{
   overflow:hidden;
   text-align:center;
 }
-
 h1{
   margin-top:40px;
   font-size:4rem;
   animation: blink 1s infinite;
 }
-
 #contador{
-  font-size:2rem;
+  font-size:2.2rem;
   margin:20px;
+  color:#00ff00;
 }
-
+.ad-banner {
+  margin: 15px auto;
+  width: 728px;
+  height: 90px;
+  background: #111;
+  border: 2px solid #ff0000;
+  color: #ff5555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 0 15px red;
+}
 button{
   padding:20px 40px;
   font-size:2rem;
@@ -34,100 +44,113 @@ button{
   cursor:pointer;
   border-radius:10px;
   box-shadow:0 0 20px red;
+  margin:20px;
 }
-
 button:hover{
-  transform:scale(1.05);
+  transform:scale(1.08);
 }
-
 #warning{
   margin-top:20px;
   color:#ff5555;
+  font-size:1.3rem;
 }
-
 @keyframes blink{
-  50%{
-    opacity:0.4;
-  }
+  50%{ opacity:0.3; }
 }
 </style>
 </head>
 <body>
-
 <h1>⚠ ZONA INFESTADA ⚠</h1>
+<div id="contador">Trackers + Ads enviados: 0</div>
 
-<div id="contador">
-Trackers enviados: 0
-</div>
+<div class="ad-banner">AD SPACE - Loading Google Ads...</div>
+<div class="ad-banner">AD SPACE - Loading Taboola...</div>
+<div class="ad-banner">AD SPACE - Loading Outbrain...</div>
 
 <button onclick="activarModoNuclear()">
 ☢ ACTIVAR MODO NUCLEAR ☢
 </button>
 
 <div id="warning">
-No recomendado para móviles débiles 😈
+No recomendado para móviles débiles ni Brave Shields 😈
 </div>
 
 <script>
-const trackers = [
+// === TRACKERS + ANUNCIOS ===
+const resources = [
+  // Trackers clásicos
   "https://www.google-analytics.com/analytics.js",
   "https://connect.facebook.net/en_US/fbevents.js",
   "https://bat.bing.com/bat.js",
   "https://static.ads-twitter.com/uwt.js",
   "https://snap.licdn.com/li.lms-analytics/insight.min.js",
-  "https://www.googletagmanager.com/gtag/js?id=AW-000000000", // Google Ads
-  "https://js.stripe.com/v3/", // Stripe
-  "https://cdn.amplitude.com/libs/amplitude-*.min.js"
+  
+  // Anuncios y Ad Networks
+  "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
+  "https://www.googletagservices.com/tag/js/gpt.js",
+  "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+  "https://cdn.taboola.com/lib/native.js",
+  "https://widgets.outbrain.com/outbrain.js",
+  "https://js.adscale.de/getads.js",
+  "https://get.s-onetag.com/tag.js",
+  "https://acdn.adnxs.com/prebid/c/12345/prebid.js",
+  
+  // Más trackers pesados
+  "https://www.google.com/ads/ga-audiences",
+  "https://cdn.amplitude.com/libs/amplitude-8.21.0-min.gz.js",
+  "https://cdn.segment.com/analytics.js/v1/abc123/analytics.min.js"
 ];
 
 let total = 0;
-let velocidad = 100;
+let velocidad = 120;
 let interval;
 
-function lanzarTracker() {
-
+function lanzarRecurso() {
+  const src = resources[Math.floor(Math.random() * resources.length)];
+  
+  // Crear script
   const script = document.createElement("script");
-
-  script.src =
-    trackers[Math.floor(Math.random()*trackers.length)] +
-    "?t=" + Date.now() +
-    "&r=" + Math.random();
-
-  script.onload = script.onerror = () => {
-    script.remove();
-  };
-
+  script.src = src + "?t=" + Date.now() + "&r=" + Math.random();
+  script.async = true;
+  script.onload = script.onerror = () => script.remove();
   document.body.appendChild(script);
 
-  total++;
+  // También intentamos iframes de anuncios
+  if (Math.random() > 0.6) {
+    const iframe = document.createElement("iframe");
+    iframe.src = "https://googleads.g.doubleclick.net/pagead/ads?client=ca-pub-123456789";
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+    setTimeout(() => iframe.remove(), 8000);
+  }
 
-  document.getElementById("contador").innerText =
-    "Trackers enviados: " + total;
+  total++;
+  document.getElementById("contador").innerText = 
+    `Trackers + Ads enviados: ${total}`;
 }
 
 function iniciar() {
   clearInterval(interval);
-  interval = setInterval(lanzarTracker, velocidad);
+  interval = setInterval(lanzarRecurso, velocidad);
 }
 
 function activarModoNuclear() {
-
-  velocidad = 1;
-
-  iniciar();
-
-  document.body.style.background = "#200";
+  velocidad = 8;        // Muy agresivo
+  document.body.style.background = "#300";
   document.body.style.color = "#ff2222";
-
-  document.querySelector("h1").innerText =
-    "☢ MODO NUCLEAR ACTIVADO ☢";
-
-  alert("Brave Shields va a sufrir 😈");
+  document.querySelector("h1").innerText = "☢ MODO NUCLEAR ACTIVADO ☢";
+  
+  // Spam aún más fuerte
+  for(let i = 0; i < 25; i++) {
+    setTimeout(lanzarRecurso, i * 10);
+  }
+  
+  iniciar();
+  alert("Brave Shields va a llorar sangre 😈");
 }
 
-// modo normal al abrir
+// Iniciar automáticamente
 iniciar();
 </script>
-
 </body>
 </html>
