@@ -1,27 +1,69 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Cuidado no entrar rastreadores</title>
+<meta charset="UTF-8">
+<title>Cuidado no entrar rastreadores</title>
+
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:#00ff00;
+  font-family:monospace;
+  overflow:hidden;
+}
+
+h1{
+  text-align:center;
+  margin-top:40px;
+  font-size:3rem;
+}
+
+#contador{
+  text-align:center;
+  font-size:2rem;
+  margin-top:20px;
+}
+</style>
 </head>
-<body style="background:black;color:#0f0;font-family:monospace">
-  <h1>⚠ CUIDADO ⚠</h1>
-  <p>Esta web está infestada de rastreadores.</p>
+<body>
 
-  <script>
-    const trackers = [
-      "https://www.google-analytics.com/analytics.js",
-      "https://connect.facebook.net/en_US/fbevents.js",
-      "https://static.ads-twitter.com/uwt.js",
-      "https://bat.bing.com/bat.js",
-      "https://snap.licdn.com/li.lms-analytics/insight.min.js"
-    ];
+<h1>⚠ CUIDADO ⚠</h1>
+<div id="contador">Trackers enviados: 0</div>
 
-    for (let i = 0; i < 200; i++) {
-      const s = document.createElement("script");
-      s.src = trackers[i % trackers.length] + "?id=" + i;
-      document.body.appendChild(s);
-    }
-  </script>
+<script>
+const dominios = [
+  "https://www.google-analytics.com/analytics.js",
+  "https://connect.facebook.net/en_US/fbevents.js",
+  "https://bat.bing.com/bat.js",
+  "https://static.ads-twitter.com/uwt.js",
+  "https://snap.licdn.com/li.lms-analytics/insight.min.js"
+];
+
+let total = 0;
+
+function generarTracker() {
+  const url =
+    dominios[Math.floor(Math.random() * dominios.length)] +
+    "?r=" + Math.random() +
+    "&t=" + Date.now();
+
+  const s = document.createElement("script");
+  s.src = url;
+
+  // eliminarlo luego para no llenar el DOM
+  s.onload = s.onerror = () => s.remove();
+
+  document.body.appendChild(s);
+
+  total++;
+  document.getElementById("contador").textContent =
+    "Trackers enviados: " + total;
+}
+
+// velocidad configurable
+setInterval(generarTracker, 10);
+</script>
+
 </body>
 </html>
