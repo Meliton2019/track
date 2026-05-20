@@ -15,142 +15,147 @@ body{
 h1{
   margin-top:40px;
   font-size:4rem;
-  animation: blink 1s infinite;
+  animation: blink 0.6s infinite;
 }
 #contador{
-  font-size:2.2rem;
+  font-size:2.4rem;
   margin:20px;
-  color:#00ff00;
+  color:#ff0000;
+  text-shadow: 0 0 10px red;
 }
 .ad-banner {
-  margin: 15px auto;
+  margin: 12px auto;
   width: 728px;
   height: 90px;
   background: #111;
   border: 2px solid #ff0000;
-  color: #ff5555;
+  color: #ff7777;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
-  box-shadow: 0 0 15px red;
+  font-size: 1.4rem;
+  box-shadow: 0 0 20px red;
 }
 button{
-  padding:20px 40px;
-  font-size:2rem;
-  background:red;
+  padding:25px 50px;
+  font-size:2.2rem;
+  background:#c00;
   color:white;
   border:none;
   cursor:pointer;
   border-radius:10px;
-  box-shadow:0 0 20px red;
-  margin:20px;
+  box-shadow:0 0 30px red;
+  margin:25px;
 }
 button:hover{
-  transform:scale(1.08);
+  transform:scale(1.1);
 }
-#warning{
-  margin-top:20px;
-  color:#ff5555;
-  font-size:1.3rem;
-}
-@keyframes blink{
-  50%{ opacity:0.3; }
-}
+@keyframes blink{ 50%{ opacity:0.2; } }
 </style>
 </head>
 <body>
 <h1>⚠ ZONA INFESTADA ⚠</h1>
-<div id="contador">Trackers + Ads enviados: 0</div>
+<div id="contador">Requests enviadas: 0</div>
 
-<div class="ad-banner">AD SPACE - Loading Google Ads...</div>
-<div class="ad-banner">AD SPACE - Loading Taboola...</div>
-<div class="ad-banner">AD SPACE - Loading Outbrain...</div>
+<div class="ad-banner">★ GOOGLE ADS LOADING ★</div>
+<div class="ad-banner">★ TABOOLA + OUTBRAIN ★</div>
+<div class="ad-banner">★ DOUBLECLICK + PREBID ★</div>
 
 <button onclick="activarModoNuclear()">
 ☢ ACTIVAR MODO NUCLEAR ☢
 </button>
 
-<div id="warning">
-No recomendado para móviles débiles ni Brave Shields 😈
-</div>
+<div id="warning">Esto va a hacer lag incluso en ordenadores buenos 😈</div>
 
 <script>
-// === TRACKERS + ANUNCIOS ===
+// Lista ampliada y más pesada
 const resources = [
-  // Trackers clásicos
   "https://www.google-analytics.com/analytics.js",
   "https://connect.facebook.net/en_US/fbevents.js",
   "https://bat.bing.com/bat.js",
-  "https://static.ads-twitter.com/uwt.js",
-  "https://snap.licdn.com/li.lms-analytics/insight.min.js",
-  
-  // Anuncios y Ad Networks
   "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
-  "https://www.googletagservices.com/tag/js/gpt.js",
   "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+  "https://www.googletagservices.com/tag/js/gpt.js",
   "https://cdn.taboola.com/lib/native.js",
   "https://widgets.outbrain.com/outbrain.js",
+  "https://static.ads-twitter.com/uwt.js",
+  "https://snap.licdn.com/li.lms-analytics/insight.min.js",
   "https://js.adscale.de/getads.js",
-  "https://get.s-onetag.com/tag.js",
-  "https://acdn.adnxs.com/prebid/c/12345/prebid.js",
-  
-  // Más trackers pesados
-  "https://www.google.com/ads/ga-audiences",
-  "https://cdn.amplitude.com/libs/amplitude-8.21.0-min.gz.js",
-  "https://cdn.segment.com/analytics.js/v1/abc123/analytics.min.js"
+  "https://acdn.adnxs.com/prebid/c/0/prebid.js",
+  "https://cdn.amplitude.com/libs/amplitude-*.min.js",
+  "https://cdn.segment.com/analytics.js/",
+  "https://googleads.g.doubleclick.net/pagead/ads",
+  "https://www.google.com/pagead/lvz",
+  "https://pixel.quantserve.com/pixel",
+  "https://cm.everesttech.net/cm",
+  "https://sync.crwdcntrl.net/"
 ];
 
+// Contador
 let total = 0;
-let velocidad = 120;
-let interval;
+let velocidad = 60;
+let interval1, interval2, interval3;
 
-function lanzarRecurso() {
-  const src = resources[Math.floor(Math.random() * resources.length)];
-  
-  // Crear script
+function crearBeacon() {
+  const url = resources[Math.floor(Math.random() * resources.length)];
+  const fullUrl = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now() + "&r=" + Math.random();
+
+  // Método 1: Script
   const script = document.createElement("script");
-  script.src = src + "?t=" + Date.now() + "&r=" + Math.random();
+  script.src = fullUrl;
   script.async = true;
   script.onload = script.onerror = () => script.remove();
   document.body.appendChild(script);
 
-  // También intentamos iframes de anuncios
-  if (Math.random() > 0.6) {
+  // Método 2: Imagen beacon (muy eficiente para spam)
+  if (Math.random() > 0.4) {
+    const img = new Image();
+    img.src = fullUrl;
+    img.style.display = "none";
+    document.body.appendChild(img);
+    setTimeout(() => img.remove(), 10000);
+  }
+
+  // Método 3: Iframe oculto
+  if (Math.random() > 0.65) {
     const iframe = document.createElement("iframe");
-    iframe.src = "https://googleads.g.doubleclick.net/pagead/ads?client=ca-pub-123456789";
+    iframe.src = "https://googleads.g.doubleclick.net/pagead/ads?client=ca-pub-random" + Math.random();
     iframe.style.display = "none";
     document.body.appendChild(iframe);
-    setTimeout(() => iframe.remove(), 8000);
+    setTimeout(() => iframe.remove(), 6000);
   }
 
   total++;
-  document.getElementById("contador").innerText = 
-    `Trackers + Ads enviados: ${total}`;
+  document.getElementById("contador").innerText = `Requests enviadas: ${total}`;
 }
 
-function iniciar() {
-  clearInterval(interval);
-  interval = setInterval(lanzarRecurso, velocidad);
+function iniciarSpam() {
+  clearInterval(interval1);
+  clearInterval(interval2);
+  clearInterval(interval3);
+
+  interval1 = setInterval(crearBeacon, velocidad);     // Principal
+  interval2 = setInterval(crearBeacon, velocidad + 25); // Paralelo
+  interval3 = setInterval(crearBeacon, velocidad + 45); // Tercero
 }
 
 function activarModoNuclear() {
-  velocidad = 8;        // Muy agresivo
-  document.body.style.background = "#300";
-  document.body.style.color = "#ff2222";
+  velocidad = 12;
+  document.body.style.background = "#200";
+  document.body.style.color = "#ff3333";
   document.querySelector("h1").innerText = "☢ MODO NUCLEAR ACTIVADO ☢";
-  
-  // Spam aún más fuerte
-  for(let i = 0; i < 25; i++) {
-    setTimeout(lanzarRecurso, i * 10);
+
+  // Spam inicial brutal
+  for(let i = 0; i < 80; i++) {
+    setTimeout(crearBeacon, i * 8);
   }
-  
-  iniciar();
-  alert("Brave Shields va a llorar sangre 😈");
+
+  iniciarSpam();
+  alert("Preparate... Brave va a empezar a sufrir de verdad 😈");
 }
 
-// Iniciar automáticamente
-iniciar();
+// Iniciar automáticamente con spam moderado
+iniciarSpam();
 </script>
 </body>
 </html>
