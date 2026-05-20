@@ -7,32 +7,69 @@
 <style>
 body{
   margin:0;
-  background:#000;
+  background:black;
   color:#00ff00;
   font-family:monospace;
   overflow:hidden;
+  text-align:center;
 }
 
 h1{
-  text-align:center;
   margin-top:40px;
-  font-size:3rem;
+  font-size:4rem;
+  animation: blink 1s infinite;
 }
 
 #contador{
-  text-align:center;
   font-size:2rem;
+  margin:20px;
+}
+
+button{
+  padding:20px 40px;
+  font-size:2rem;
+  background:red;
+  color:white;
+  border:none;
+  cursor:pointer;
+  border-radius:10px;
+  box-shadow:0 0 20px red;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+#warning{
   margin-top:20px;
+  color:#ff5555;
+}
+
+@keyframes blink{
+  50%{
+    opacity:0.4;
+  }
 }
 </style>
 </head>
 <body>
 
-<h1>⚠ CUIDADO ⚠</h1>
-<div id="contador">Trackers enviados: 0</div>
+<h1>⚠ ZONA INFESTADA ⚠</h1>
+
+<div id="contador">
+Trackers enviados: 0
+</div>
+
+<button onclick="activarModoNuclear()">
+☢ ACTIVAR MODO NUCLEAR ☢
+</button>
+
+<div id="warning">
+No recomendado para móviles débiles 😈
+</div>
 
 <script>
-const dominios = [
+const trackers = [
   "https://www.google-analytics.com/analytics.js",
   "https://connect.facebook.net/en_US/fbevents.js",
   "https://bat.bing.com/bat.js",
@@ -41,28 +78,52 @@ const dominios = [
 ];
 
 let total = 0;
+let velocidad = 100;
+let interval;
 
-function generarTracker() {
-  const url =
-    dominios[Math.floor(Math.random() * dominios.length)] +
-    "?r=" + Math.random() +
-    "&t=" + Date.now();
+function lanzarTracker() {
 
-  const s = document.createElement("script");
-  s.src = url;
+  const script = document.createElement("script");
 
-  // eliminarlo luego para no llenar el DOM
-  s.onload = s.onerror = () => s.remove();
+  script.src =
+    trackers[Math.floor(Math.random()*trackers.length)] +
+    "?t=" + Date.now() +
+    "&r=" + Math.random();
 
-  document.body.appendChild(s);
+  script.onload = script.onerror = () => {
+    script.remove();
+  };
+
+  document.body.appendChild(script);
 
   total++;
-  document.getElementById("contador").textContent =
+
+  document.getElementById("contador").innerText =
     "Trackers enviados: " + total;
 }
 
-// velocidad configurable
-setInterval(generarTracker, 10);
+function iniciar() {
+  clearInterval(interval);
+  interval = setInterval(lanzarTracker, velocidad);
+}
+
+function activarModoNuclear() {
+
+  velocidad = 1;
+
+  iniciar();
+
+  document.body.style.background = "#200";
+  document.body.style.color = "#ff2222";
+
+  document.querySelector("h1").innerText =
+    "☢ MODO NUCLEAR ACTIVADO ☢";
+
+  alert("Brave Shields va a sufrir 😈");
+}
+
+// modo normal al abrir
+iniciar();
 </script>
 
 </body>
