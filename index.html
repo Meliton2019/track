@@ -14,148 +14,135 @@ body{
 }
 h1{
   margin-top:40px;
-  font-size:4rem;
-  animation: blink 0.6s infinite;
+  font-size:4.5rem;
+  animation: blink 0.4s infinite;
+  text-shadow: 0 0 20px red;
 }
 #contador{
-  font-size:2.4rem;
+  font-size:2.6rem;
   margin:20px;
   color:#ff0000;
-  text-shadow: 0 0 10px red;
-}
-.ad-banner {
-  margin: 12px auto;
-  width: 728px;
-  height: 90px;
-  background: #111;
-  border: 2px solid #ff0000;
-  color: #ff7777;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  box-shadow: 0 0 20px red;
+  text-shadow: 0 0 15px red;
 }
 button{
-  padding:25px 50px;
-  font-size:2.2rem;
+  padding:30px 60px;
+  font-size:2.4rem;
   background:#c00;
   color:white;
   border:none;
   cursor:pointer;
-  border-radius:10px;
-  box-shadow:0 0 30px red;
-  margin:25px;
+  border-radius:12px;
+  box-shadow:0 0 40px red;
+  margin:30px;
 }
 button:hover{
-  transform:scale(1.1);
+  transform:scale(1.15);
 }
-@keyframes blink{ 50%{ opacity:0.2; } }
+@keyframes blink{ 50%{ opacity:0.1; } }
 </style>
 </head>
 <body>
 <h1>⚠ ZONA INFESTADA ⚠</h1>
 <div id="contador">Requests enviadas: 0</div>
 
-<div class="ad-banner">★ GOOGLE ADS LOADING ★</div>
-<div class="ad-banner">★ TABOOLA + OUTBRAIN ★</div>
-<div class="ad-banner">★ DOUBLECLICK + PREBID ★</div>
-
 <button onclick="activarModoNuclear()">
-☢ ACTIVAR MODO NUCLEAR ☢
+☢ ACTIVAR MODO ULTRA NUCLEAR ☢
 </button>
 
-<div id="warning">Esto va a hacer lag incluso en ordenadores buenos 😈</div>
+<div id="warning">Esto va a saturar el navegador lo más rápido posible 😈</div>
 
 <script>
-// Lista ampliada y más pesada
+// Lista grande de recursos pesados
 const resources = [
-  "https://www.google-analytics.com/analytics.js",
-  "https://connect.facebook.net/en_US/fbevents.js",
-  "https://bat.bing.com/bat.js",
   "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
   "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
   "https://www.googletagservices.com/tag/js/gpt.js",
+  "https://connect.facebook.net/en_US/fbevents.js",
+  "https://www.google-analytics.com/analytics.js",
+  "https://bat.bing.com/bat.js",
   "https://cdn.taboola.com/lib/native.js",
   "https://widgets.outbrain.com/outbrain.js",
   "https://static.ads-twitter.com/uwt.js",
-  "https://snap.licdn.com/li.lms-analytics/insight.min.js",
-  "https://js.adscale.de/getads.js",
   "https://acdn.adnxs.com/prebid/c/0/prebid.js",
-  "https://cdn.amplitude.com/libs/amplitude-*.min.js",
-  "https://cdn.segment.com/analytics.js/",
   "https://googleads.g.doubleclick.net/pagead/ads",
-  "https://www.google.com/pagead/lvz",
-  "https://pixel.quantserve.com/pixel",
   "https://cm.everesttech.net/cm",
-  "https://sync.crwdcntrl.net/"
+  "https://pixel.quantserve.com/pixel",
+  "https://sync.crwdcntrl.net/",
+  "https://cdn.segment.com/analytics.js/"
 ];
 
-// Contador
 let total = 0;
-let velocidad = 60;
-let interval1, interval2, interval3;
+let running = false;
 
-function crearBeacon() {
+function spamRapido() {
+  if (!running) return;
+
   const url = resources[Math.floor(Math.random() * resources.length)];
-  const fullUrl = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now() + "&r=" + Math.random();
+  const cacheBuster = "?t=" + Date.now() + "&r=" + Math.random();
 
-  // Método 1: Script
-  const script = document.createElement("script");
-  script.src = fullUrl;
-  script.async = true;
-  script.onload = script.onerror = () => script.remove();
-  document.body.appendChild(script);
+  // 1. Script
+  const s = document.createElement("script");
+  s.src = url + cacheBuster;
+  s.async = true;
+  document.body.appendChild(s);
 
-  // Método 2: Imagen beacon (muy eficiente para spam)
-  if (Math.random() > 0.4) {
-    const img = new Image();
-    img.src = fullUrl;
-    img.style.display = "none";
-    document.body.appendChild(img);
-    setTimeout(() => img.remove(), 10000);
-  }
+  // 2. Imagen (Beacon)
+  const img = new Image();
+  img.src = url + cacheBuster;
+  document.body.appendChild(img);
 
-  // Método 3: Iframe oculto
-  if (Math.random() > 0.65) {
+  // 3. Fetch (muy agresivo)
+  fetch(url + cacheBuster, { 
+    mode: 'no-cors', 
+    cache: 'no-store' 
+  }).catch(() => {});
+
+  // 4. XMLHttpRequest
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", url + cacheBuster, true);
+    xhr.send();
+  } catch(e) {}
+
+  // 5. Iframe
+  if (Math.random() > 0.7) {
     const iframe = document.createElement("iframe");
-    iframe.src = "https://googleads.g.doubleclick.net/pagead/ads?client=ca-pub-random" + Math.random();
+    iframe.src = "https://googleads.g.doubleclick.net/pagead/ads?client=ca-pub-" + Math.random().toString().slice(2,15);
     iframe.style.display = "none";
     document.body.appendChild(iframe);
-    setTimeout(() => iframe.remove(), 6000);
   }
 
-  total++;
-  document.getElementById("contador").innerText = `Requests enviadas: ${total}`;
-}
+  total += 5; // aproximado
+  document.getElementById("contador").innerText = `Requests enviadas: ${total.toLocaleString()}`;
 
-function iniciarSpam() {
-  clearInterval(interval1);
-  clearInterval(interval2);
-  clearInterval(interval3);
-
-  interval1 = setInterval(crearBeacon, velocidad);     // Principal
-  interval2 = setInterval(crearBeacon, velocidad + 25); // Paralelo
-  interval3 = setInterval(crearBeacon, velocidad + 45); // Tercero
+  // Llamada recursiva lo más rápido posible
+  setTimeout(spamRapido, 0);   // Máxima velocidad
 }
 
 function activarModoNuclear() {
-  velocidad = 12;
+  running = true;
   document.body.style.background = "#200";
-  document.body.style.color = "#ff3333";
-  document.querySelector("h1").innerText = "☢ MODO NUCLEAR ACTIVADO ☢";
+  document.body.style.color = "#ff2222";
+  document.querySelector("h1").innerText = "☢ MODO ULTRA NUCLEAR ACTIVADO ☢";
 
-  // Spam inicial brutal
-  for(let i = 0; i < 80; i++) {
-    setTimeout(crearBeacon, i * 8);
+  // Ráfaga inicial brutal
+  for(let i = 0; i < 150; i++) {
+    setTimeout(() => {
+      for(let j = 0; j < 8; j++) spamRapido();
+    }, i * 4);
   }
 
-  iniciarSpam();
-  alert("Preparate... Brave va a empezar a sufrir de verdad 😈");
+  spamRapido();
+  alert("¡Preparate! Se va a saturar todo lo que pueda 😈");
 }
 
-// Iniciar automáticamente con spam moderado
-iniciarSpam();
+// Iniciar automáticamente con fuerza media-alta
+running = true;
+setTimeout(() => {
+  for(let i = 0; i < 40; i++) spamRapido();
+}, 500);
+
+spamRapido();
 </script>
 </body>
 </html>
